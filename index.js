@@ -20,12 +20,9 @@ var opts = {
 	port: "443",
 	extraHeaders: {
 		Cookie: process.env.PPLX_COOKIE,
-		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+		"User-Agent": process.env.USER_AGENT,
 		Accept: "*/*",
 		priority: "u=1, i",
-		"Accept-Encoding": "gzip, deflate, br, zstd",
-		"Accept-Language": "zh-CN,zh;q=0.9",
-		"Sec-Ch-Ua": `"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"`,
 		Referer: "https://www.perplexity.ai/",
 	},
 };
@@ -162,7 +159,7 @@ app.post("/v1/messages", (req, res) => {
                         });
                 });
                 socket.onAny((event, ...args) => {
-                    console.log(`got unknown ${event}`);
+                    console.log(`got ${event}`);
                 });
                 socket.on("query_progress", (data) => {
                     if(data.text){
