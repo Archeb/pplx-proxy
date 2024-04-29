@@ -14,7 +14,7 @@
 
 7. 启动 start.bat
 
-8. 酒馆中选择 Claude，反向代理地址填 http://127.0.0.1:8081/v1
+8. 酒馆中选择 Claude，反向代理地址填 http://127.0.0.1:8081/v1。反代密码必须填，随便什么都可以。
 
 9. 开始使用。如果失败了/没有结果/403/Warning 就多重试几次。
 
@@ -38,7 +38,7 @@
 
 7. Start start.bat
 
-8. Select Claude in the Tavern and put http://127.0.0.1:8081/v1 as the address of the reverse proxy.
+8. Select Claude in the Tavern and put http://127.0.0.1:8081/v1 as the address of the reverse proxy. Use any random string for password.
 
 9. Enjoy it. If it fails/no result/403/Warning, try again.
 
