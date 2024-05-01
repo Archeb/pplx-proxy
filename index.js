@@ -1,11 +1,14 @@
 const express = require("express");
 const { io } = require("socket.io-client");
 const { v4: uuidv4 } = require("uuid");
+const { ProxyAgent } = require("proxy-agent");
+const agent = new ProxyAgent();
 
 const app = express();
 const port = process.env.PORT || 8081;
 
 var opts = {
+	agent: agent,
 	auth: {
 		jwt: "anonymous-ask-user",
 	},

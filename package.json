@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "express": "^4.19.2",
+    "proxy-agent": "^6.4.0",
     "socket.io-client": "^4.7.5",
     "uuid": "^9.0.1"
   }
