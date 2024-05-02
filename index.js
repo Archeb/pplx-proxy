@@ -12,10 +12,7 @@ var opts = {
 	auth: {
 		jwt: "anonymous-ask-user",
 	},
-	reconnection: true,
-	reconnectionDelay: 500,
-	reconnectionDelayMax: 5000,
-	reconnectionAttempts: 999,
+	reconnection: false,
 	transports: ["websocket"],
 	path: "/socket.io",
 	hostname: "www.perplexity.ai",
@@ -159,10 +156,14 @@ app.post("/v1/messages", (req, res) => {
                             res.write(createEvent("message_stop", { type: "message_stop" }));
 
                             res.end();
-                        });
+                        }).catch((error) => {
+							if(error.message != "socket has been disconnected"){
+								console.log(error);
+							}
+						});
                 });
                 socket.onAny((event, ...args) => {
-                    console.log(`got ${event}`);
+                    console.log(`> [got ${event}]`);
                 });
                 socket.on("query_progress", (data) => {
                     if(data.text){
@@ -182,15 +183,49 @@ app.post("/v1/messages", (req, res) => {
                     console.log(" > [Disconnected]");
                 });
                 socket.on("error", (error) => {
+					chunkJSON = JSON.stringify({
+						type: "content_block_delta",
+						index: 0,
+						delta: { type: "text_delta", text: "Error occured while fetching output 输出时出现错误\nPlease refer to the log for more information 请查看日志以获取更多信息" },
+					});
+					res.write(createEvent("content_block_delta", chunkJSON));
+					res.write(createEvent("content_block_stop", { type: "content_block_stop", index: 0 }));
+					res.write(
+						createEvent("message_delta", {
+							type: "message_delta",
+							delta: { stop_reason: "end_turn", stop_sequence: null },
+							usage: { output_tokens: 12 },
+						})
+					);
+					res.write(createEvent("message_stop", { type: "message_stop" }));
+
+					res.end();
                     console.log(error);
                 });
                 socket.on("connect_error", function (error) {
-                    if (error.description && error.description == 403) {
-                        console.log(" > [Error] 403 Forbidden");
-                    }
+					chunkJSON = JSON.stringify({
+						type: "content_block_delta",
+						index: 0,
+						delta: { type: "text_delta", text: "Failed to connect to the Perplexity.ai 连接到Perplexity失败\nPlease refer to the log for more information 请查看日志以获取更多信息" },
+					});
+					res.write(createEvent("content_block_delta", chunkJSON));
+					res.write(createEvent("content_block_stop", { type: "content_block_stop", index: 0 }));
+					res.write(
+						createEvent("message_delta", {
+							type: "message_delta",
+							delta: { stop_reason: "end_turn", stop_sequence: null },
+							usage: { output_tokens: 12 },
+						})
+					);
+					res.write(createEvent("message_stop", { type: "message_stop" }));
+
+					res.end();
                     console.log(error);
                 });
-				
+				res.on("close", function () {
+					console.log(" > [Client closed]");
+					socket.disconnect();
+				});
 			} else {
 				throw new Error("Invalid request");
 			}
